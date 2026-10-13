@@ -76,6 +76,7 @@ source = ["invoice_parser_llm"]
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "C4", "PT"]
