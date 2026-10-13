@@ -1,0 +1,73 @@
+{
+  "document_type": "invoice",
+  "invoice_number": "2026-1187",
+  "issue_date": "2026-10-05",
+  "due_date": "2026-10-19",
+  "currency": "EUR",
+  "vendor": {
+    "name": "Initech Office Supplies B.V.",
+    "address": "Sample Canal 10, 1011 AB Lakeside",
+    "tax_id": "NL000000000B01",
+    "email": "orders@initech-supplies.example"
+  },
+  "buyer": {
+    "name": "Umbrella Robotics GmbH",
+    "address": "Example Allee 5, 10115 Northgate",
+    "tax_id": "DE000000000"
+  },
+  "line_items": [
+    {
+      "description": "Ergonomic office chair",
+      "sku": "CH-200",
+      "quantity": 4.0,
+      "unit_price": 289.0,
+      "tax_rate": 21.0,
+      "amount": 1156.0
+    },
+    {
+      "description": "Standing desk frame",
+      "sku": "DK-415",
+      "quantity": 2.0,
+      "unit_price": 415.0,
+      "tax_rate": 21.0,
+      "amount": 830.0
+    },
+    {
+      "description": "Printer paper A4, box of 5 reams",
+      "sku": "PP-005",
+      "quantity": 10.0,
+      "unit_price": 24.9,
+      "tax_rate": 21.0,
+      "amount": 249.0
+    },
+    {
+      "description": "Office coffee beans, 6 kg",
+      "sku": "CF-006",
+      "quantity": 1.0,
+      "unit_price": 120.0,
+      "tax_rate": 9.0,
+      "amount": 120.0
+    }
+  ],
+  "subtotal": 2355.0,
+  "discount_total": 99.3,
+  "shipping_total": 35.0,
+  "taxes": [
+    {
+      "name": "VAT",
+      "rate": 21.0,
+      "base": 2170.7,
+      "amount": 455.85
+    },
+    {
+      "name": "VAT",
+      "rate": 9.0,
+      "base": 120.0,
+      "amount": 10.8
+    }
+  ],
+  "tax_total": 466.65,
+  "total": 2757.35,
+  "amount_due": 2757.35,
+  "payment_terms": "14 days net"
+}
