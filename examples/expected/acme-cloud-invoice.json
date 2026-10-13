@@ -17,23 +17,23 @@
   "line_items": [
     {
       "description": "Cloud hosting - Pro plan (September)",
-      "quantity": 3.0,
+      "quantity": 3,
       "unit": "seat",
-      "unit_price": 249.0,
-      "amount": 747.0
+      "unit_price": 249,
+      "amount": 747
     },
     {
       "description": "Managed PostgreSQL cluster",
-      "quantity": 1.0,
+      "quantity": 1,
       "unit": "month",
-      "unit_price": 180.0,
-      "amount": 180.0
+      "unit_price": 180,
+      "amount": 180
     },
     {
       "description": "Engineering support",
       "quantity": 6.5,
       "unit": "h",
-      "unit_price": 95.0,
+      "unit_price": 95,
       "amount": 617.5
     }
   ],
@@ -41,7 +41,7 @@
   "taxes": [
     {
       "name": "VAT",
-      "rate": 20.0,
+      "rate": 20,
       "base": 1544.5,
       "amount": 308.9
     }

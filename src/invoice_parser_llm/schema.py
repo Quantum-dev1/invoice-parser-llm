@@ -93,7 +93,7 @@ def _serialize_decimal(value: Decimal) -> float | int:
 Money = Annotated[
     Decimal,
     BeforeValidator(parse_decimal),
-    PlainSerializer(_serialize_decimal, return_type=float, when_used="json"),
+    PlainSerializer(_serialize_decimal, return_type=int | float, when_used="json"),
 ]
 """A monetary amount (or quantity / percentage) parsed leniently and serialized as a JSON number."""
 

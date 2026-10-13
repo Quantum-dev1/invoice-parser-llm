@@ -81,6 +81,7 @@ def test_money_serializes_as_json_numbers() -> None:
     data = json.loads(inv.model_dump_json())
     assert data["total"] == 1853.4
     assert data["subtotal"] == 1544
+    assert isinstance(data["subtotal"], int)
     assert isinstance(inv.total, Decimal)
 
 

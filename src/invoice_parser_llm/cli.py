@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+from decimal import Decimal
 from pathlib import Path
 from typing import Annotated
 
@@ -53,20 +54,26 @@ def main(
 
 def _summary(result: ParseResult) -> None:
     inv = result.invoice
-    title = (
-        f"{result.file}  ·  confidence {result.confidence:.2f}  ·  {result.extraction}  ·  {result.attempts} attempt(s)"
+    status = "[bold red]needs review[/]" if result.needs_review else "[bold green]ok[/]"
+    err.print(
+        f"[bold]{result.file}[/]  {status}  ·  confidence [bold]{result.confidence:.2f}[/]  ·  "
+        f"{result.extraction}  ·  {result.attempts} attempt(s)"
     )
-    table = Table(title=title, show_header=False, title_justify="left")
+    table = Table(show_header=False, box=None, padding=(0, 2, 0, 0))
     table.add_column(style="dim")
     table.add_column()
     if inv:
+
+        def money(value: Decimal | None) -> str:
+            return "—" if value is None else f"{value:,.2f} {inv.currency or ''}".strip()
+
         table.add_row("Vendor", inv.vendor.name or "—")
         table.add_row("Buyer", (inv.buyer.name if inv.buyer else None) or "—")
         table.add_row("Number / date", f"{inv.invoice_number or '—'} / {inv.issue_date or '—'}")
         table.add_row("Line items", str(len(inv.line_items)))
-        table.add_row("Total", f"{inv.total if inv.total is not None else '—'} {inv.currency or ''}")
-    status = "[red]needs review[/red]" if result.needs_review else "[green]ok[/green]"
-    table.add_row("Status", status)
+        table.add_row("Subtotal", money(inv.subtotal))
+        table.add_row("Tax", money(inv.tax_total))
+        table.add_row("Total", f"[bold]{money(inv.total)}[/]")
     for issue in result.issues:
         color = "red" if issue.severity == "error" else "yellow"
         table.add_row(f"[{color}]{issue.code}[/{color}]", issue.message)
@@ -173,6 +180,64 @@ def validate(
     typer.echo(json.dumps([i.model_dump(mode="json") for i in issues], indent=2, ensure_ascii=False))
     if any(i.severity == "error" for i in issues):
         raise typer.Exit(2)
+
+
+@app.command(name="eval")
+def evaluate(
+    folder: Annotated[Path, typer.Argument(exists=True, file_okay=False, help="Folder with documents.")],
+    truth: Annotated[Path, typer.Argument(exists=True, file_okay=False, help="Folder with ground-truth JSON files.")],
+    workers: Annotated[int, typer.Option(min=1, max=64, help="Parallel requests.")] = 4,
+    report: Annotated[Path | None, typer.Option("--report", help="Write the full report as JSON.")] = None,
+    model: Annotated[str | None, typer.Option(help="Override INVOICE_LLM_MODEL.")] = None,
+    base_url: Annotated[str | None, typer.Option(help="Override INVOICE_LLM_BASE_URL.")] = None,
+    vision_model: Annotated[str | None, typer.Option(help="Override INVOICE_LLM_VISION_MODEL.")] = None,
+) -> None:
+    """Measure field-level accuracy against labeled ground truth (matched by file name)."""
+    from .batch import find_documents, parse_many
+    from .evaluation import build_report, match_truth, score_document
+
+    truth_files = sorted(truth.glob("*.json"))
+    pairs = {doc: match_truth(doc, truth_files) for doc in find_documents(folder)}
+    paths = [doc for doc, t in pairs.items() if t is not None]
+    if not paths:
+        raise _fail("no documents with matching ground truth found")
+    try:
+        parser = make_parser(model, base_url, vision_model)
+    except ConfigError as exc:
+        raise _fail(str(exc)) from exc
+
+    scores = []
+    with err.status(f"Evaluating {len(paths)} document(s)…"):
+        for item in parse_many(parser, paths, workers=workers):
+            truth_path = pairs[item.path]
+            assert truth_path is not None
+            predicted = item.result.invoice if item.result else None
+            scores.append(
+                score_document(item.path.name, truth_path, predicted, item.result.needs_review if item.result else None)
+            )
+    scores.sort(key=lambda s: s.file)
+    result = build_report(scores)
+
+    docs = Table(title="Documents", title_justify="left")
+    for col in ("File", "Accuracy", "Needs review", "Wrong fields"):
+        docs.add_column(col)
+    for s in result.documents:
+        wrong = ", ".join(k for k, ok in s.fields.items() if not ok) or "—"
+        docs.add_row(s.file, f"{s.accuracy:.0%}", str(s.needs_review), wrong)
+    err.print(docs)
+    fields = Table(title="Field accuracy", title_justify="left")
+    fields.add_column("Field")
+    fields.add_column("Accuracy", justify="right")
+    for name, acc in result.field_accuracy.items():
+        color = "green" if acc == 1 else "yellow" if acc >= 0.8 else "red"
+        fields.add_row(name, f"[{color}]{acc:.0%}[/{color}]")
+    err.print(fields)
+    err.print(
+        f"Overall field accuracy: [bold]{result.overall_accuracy:.1%}[/bold] · "
+        f"exact documents: {result.exact_documents}/{len(result.documents)}"
+    )
+    if report:
+        report.write_text(result.model_dump_json(indent=2), encoding="utf-8")
 
 
 @app.command()

@@ -19,50 +19,50 @@
     {
       "description": "Ergonomic office chair",
       "sku": "CH-200",
-      "quantity": 4.0,
-      "unit_price": 289.0,
-      "tax_rate": 21.0,
-      "amount": 1156.0
+      "quantity": 4,
+      "unit_price": 289,
+      "tax_rate": 21,
+      "amount": 1156
     },
     {
       "description": "Standing desk frame",
       "sku": "DK-415",
-      "quantity": 2.0,
-      "unit_price": 415.0,
-      "tax_rate": 21.0,
-      "amount": 830.0
+      "quantity": 2,
+      "unit_price": 415,
+      "tax_rate": 21,
+      "amount": 830
     },
     {
       "description": "Printer paper A4, box of 5 reams",
       "sku": "PP-005",
-      "quantity": 10.0,
+      "quantity": 10,
       "unit_price": 24.9,
-      "tax_rate": 21.0,
-      "amount": 249.0
+      "tax_rate": 21,
+      "amount": 249
     },
     {
       "description": "Office coffee beans, 6 kg",
       "sku": "CF-006",
-      "quantity": 1.0,
-      "unit_price": 120.0,
-      "tax_rate": 9.0,
-      "amount": 120.0
+      "quantity": 1,
+      "unit_price": 120,
+      "tax_rate": 9,
+      "amount": 120
     }
   ],
-  "subtotal": 2355.0,
+  "subtotal": 2355,
   "discount_total": 99.3,
-  "shipping_total": 35.0,
+  "shipping_total": 35,
   "taxes": [
     {
       "name": "VAT",
-      "rate": 21.0,
+      "rate": 21,
       "base": 2170.7,
       "amount": 455.85
     },
     {
       "name": "VAT",
-      "rate": 9.0,
-      "base": 120.0,
+      "rate": 9,
+      "base": 120,
       "amount": 10.8
     }
   ],
